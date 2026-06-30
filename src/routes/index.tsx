@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import { BillsList } from "@/components/BillsList";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -175,6 +176,7 @@ function DashboardPage() {
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           {/* Left Column: Split Expenses */}
           <div className="space-y-8 lg:col-span-8">
+            <BillsList />
             <section>
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-medium">Contas Indispensáveis</h2>
