@@ -104,9 +104,6 @@ function DashboardPage() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
-            <span className="font-serif text-xl italic tracking-tight text-brand-deep">
-              Vela
-            </span>
             <div className="hidden items-center gap-6 md:flex">
               <a href="#" className="text-sm font-medium text-brand-deep">
                 Visão Geral
