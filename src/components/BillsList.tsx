@@ -1,13 +1,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import {
-  CalendarIcon,
-  Pencil,
-  Trash2,
-  Plus,
-  Check,
-} from "lucide-react";
+import { CalendarIcon, Pencil, Trash2, Plus, Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,51 +21,28 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-export type Bill = {
-  id: string;
-  label: string;
-  amount: number;
-  dueDate: string; // ISO
-  paidDate: string | null;
-};
-
-const BRL = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
-
-const initialBills: Bill[] = [
-  {
-    id: "b1",
-    label: "Aluguel e Condomínio",
-    amount: 2450,
-    dueDate: new Date(new Date().getFullYear(), new Date().getMonth(), 5).toISOString(),
-    paidDate: null,
-  },
-  {
-    id: "b2",
-    label: "Energia Elétrica",
-    amount: 312.4,
-    dueDate: new Date(new Date().getFullYear(), new Date().getMonth(), 15).toISOString(),
-    paidDate: new Date().toISOString(),
-  },
-  {
-    id: "b3",
-    label: "Internet",
-    amount: 129.9,
-    dueDate: new Date(new Date().getFullYear(), new Date().getMonth(), 20).toISOString(),
-    paidDate: null,
-  },
-];
+import { BRL, type Bill } from "@/lib/finance-store";
 
 function fmt(d: string | null) {
   if (!d) return "—";
   return format(new Date(d), "dd MMM yyyy", { locale: ptBR });
 }
 
-export function BillsList() {
-  const [bills, setBills] = React.useState<Bill[]>(initialBills);
+export function BillsList({
+  bills,
+  hydrated,
+  onToggle,
+  onRemove,
+  onAdd,
+  onUpdate,
+}: {
+  bills: Bill[];
+  hydrated: boolean;
+  onToggle: (id: string) => void;
+  onRemove: (id: string) => void;
+  onAdd: (bill: Omit<Bill, "id">) => void;
+  onUpdate: (bill: Bill) => void;
+}) {
   const [open, setOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<Bill | null>(null);
 
@@ -81,26 +51,6 @@ export function BillsList() {
     .filter((b) => b.paidDate)
     .reduce((sum, b) => sum + b.amount, 0);
   const aberto = total - pago;
-
-  const togglePaid = (id: string) =>
-    setBills((curr) =>
-      curr.map((b) =>
-        b.id === id
-          ? { ...b, paidDate: b.paidDate ? null : new Date().toISOString() }
-          : b,
-      ),
-    );
-
-  const remove = (id: string) =>
-    setBills((curr) => curr.filter((b) => b.id !== id));
-
-  const upsert = (bill: Bill) =>
-    setBills((curr) => {
-      const exists = curr.some((b) => b.id === bill.id);
-      return exists
-        ? curr.map((b) => (b.id === bill.id ? bill : b))
-        : [...curr, bill];
-    });
 
   return (
     <section>
@@ -125,16 +75,20 @@ export function BillsList() {
       </div>
 
       <div className="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
-        {bills.length === 0 ? (
+        {!hydrated || bills.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">
-            Nenhuma conta cadastrada.
+            {hydrated
+              ? "Nenhuma conta cadastrada. Clique em 'Nova conta' para começar."
+              : "Carregando..."}
           </p>
         ) : (
           <ul className="divide-y divide-border">
             {bills.map((bill) => {
               const paid = !!bill.paidDate;
               const overdue =
-                !paid && new Date(bill.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+                !paid &&
+                new Date(bill.dueDate) <
+                  new Date(new Date().setHours(0, 0, 0, 0));
               return (
                 <li
                   key={bill.id}
@@ -142,7 +96,7 @@ export function BillsList() {
                 >
                   <Checkbox
                     checked={paid}
-                    onCheckedChange={() => togglePaid(bill.id)}
+                    onCheckedChange={() => onToggle(bill.id)}
                     className="size-5 rounded-md data-[state=checked]:border-brand data-[state=checked]:bg-brand"
                     aria-label={paid ? "Marcar como não pago" : "Marcar como pago"}
                   />
@@ -157,11 +111,7 @@ export function BillsList() {
                       {bill.label}
                     </p>
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                      <span
-                        className={cn(
-                          overdue && "font-medium text-alert",
-                        )}
-                      >
+                      <span className={cn(overdue && "font-medium text-alert")}>
                         Vence {fmt(bill.dueDate)}
                       </span>
                       {paid && (
@@ -206,7 +156,7 @@ export function BillsList() {
                       variant="ghost"
                       size="icon"
                       className="size-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => remove(bill.id)}
+                      onClick={() => onRemove(bill.id)}
                       aria-label="Excluir"
                     >
                       <Trash2 className="size-4" />
@@ -224,7 +174,12 @@ export function BillsList() {
         onOpenChange={setOpen}
         editing={editing}
         onSubmit={(bill) => {
-          upsert(bill);
+          if (editing) onUpdate(bill as Bill);
+          else {
+            const { id: _id, ...rest } = bill;
+            void _id;
+            onAdd(rest);
+          }
           setOpen(false);
         }}
       />
@@ -257,19 +212,20 @@ function BillDialog({
     }
   }, [open, editing]);
 
+  const parsedAmount = parseFloat(amount.replace(",", "."));
   const canSubmit =
     label.trim().length > 0 &&
     !!dueDate &&
-    !Number.isNaN(parseFloat(amount.replace(",", "."))) &&
-    parseFloat(amount.replace(",", ".")) >= 0;
+    !Number.isNaN(parsedAmount) &&
+    parsedAmount >= 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || !dueDate) return;
     onSubmit({
-      id: editing?.id ?? crypto.randomUUID(),
+      id: editing?.id ?? "",
       label: label.trim().slice(0, 80),
-      amount: parseFloat(amount.replace(",", ".")),
+      amount: parsedAmount,
       dueDate: dueDate.toISOString(),
       paidDate: paidDate ? paidDate.toISOString() : null,
     });
