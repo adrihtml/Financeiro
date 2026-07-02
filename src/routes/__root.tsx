@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vela — Painel financeiro pessoal" },
+      { title: "Painel financeiro pessoal" },
       {
         name: "description",
         content:
           "Controle gastos, guarde dinheiro e separe contas indispensáveis e dispensáveis num só painel calmo e direto.",
       },
-      { property: "og:title", content: "Vela — Painel financeiro pessoal" },
+      { property: "og:title", content: "Painel financeiro pessoal" },
       {
         property: "og:description",
         content:
