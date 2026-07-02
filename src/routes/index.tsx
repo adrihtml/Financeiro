@@ -16,15 +16,9 @@ import { BillsList } from "@/components/BillsList";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vela — Painel financeiro pessoal" },
+      { title: "Painel financeiro pessoal" },
       {
         name: "description",
-        content:
-          "Controle gastos, guarde dinheiro e separe contas indispensáveis e dispensáveis num só painel calmo e direto.",
-      },
-      { property: "og:title", content: "Vela — Painel financeiro pessoal" },
-      {
-        property: "og:description",
         content:
           "Controle gastos, guarde dinheiro e separe contas indispensáveis e dispensáveis num só painel calmo e direto.",
       },
@@ -104,9 +98,6 @@ function DashboardPage() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-8">
-            <span className="font-serif text-xl italic tracking-tight text-brand-deep">
-              Vela
-            </span>
             <div className="hidden items-center gap-6 md:flex">
               <a href="#" className="text-sm font-medium text-brand-deep">
                 Visão Geral
@@ -325,25 +316,10 @@ function DashboardPage() {
         </div>
       </main>
 
-      <footer className="mx-auto max-w-6xl border-t border-border px-6 py-12">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row">
-          <div className="max-w-[35ch]">
-            <p className="mb-2 font-serif italic text-brand-deep">
-              Vela Finanças
-            </p>
-            <p className="text-pretty text-sm text-muted-foreground">
-              Ferramenta de controle consciente para quem busca estabilidade e
-              crescimento financeiro a longo prazo.
-            </p>
-          </div>
-          <div className="flex gap-12">
-            <FooterCol
-              title="Sistema"
-              items={["Segurança", "Exportar Dados"]}
-            />
-            <FooterCol title="Suporte" items={["Ajuda", "Contato"]} />
-          </div>
-        </div>
+      <footer className="mx-auto max-w-6xl border-t border-border px-6 py-8">
+        <p className="text-xs text-muted-foreground">
+          Painel financeiro pessoal
+        </p>
       </footer>
     </div>
   );
