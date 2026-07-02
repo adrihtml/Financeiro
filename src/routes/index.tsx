@@ -16,15 +16,9 @@ import { BillsList } from "@/components/BillsList";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vela — Painel financeiro pessoal" },
+      { title: "Painel financeiro pessoal" },
       {
         name: "description",
-        content:
-          "Controle gastos, guarde dinheiro e separe contas indispensáveis e dispensáveis num só painel calmo e direto.",
-      },
-      { property: "og:title", content: "Vela — Painel financeiro pessoal" },
-      {
-        property: "og:description",
         content:
           "Controle gastos, guarde dinheiro e separe contas indispensáveis e dispensáveis num só painel calmo e direto.",
       },
